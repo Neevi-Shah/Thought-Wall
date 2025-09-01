@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Thought Wall</title>
+
+</head>
+<body>
+
+<h1>My Thought Wall 💭</h1>
+
+  <!-- Input box and button -->
+  <div class="input_area">
+    <textarea id="thoughtsInput" placeholder="What's on your mind?"></textarea>
+    <button onclick="addThought()" id="addThought">Add Thought Brick</button>
+  </div>
+
+  <!-- Output area for all thought bricks -->
+  <div class="thoughtsContainer" id="thoughtsContainer"></div>
+
+  <!-- ✅ Internal CSS for styling -->
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: rgb(255, 252, 252);
+      padding: 50px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 40px;
+      color: rgb(167, 109, 221);
+      margin-bottom: 50px;
+      text-decoration: underline rgb(162, 219, 190);
+    }
+
+    .input_area {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+      margin: auto;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      resize: none;
+      background-color: aliceblue;
+    }
+
+    #addThought {
+      background-color: lightcoral;
+      color: white;
+      padding: 7px;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #addThought:hover {
+      background-color: rgb(248, 168, 188);
+      text-decoration: underline;
+    }
+
+    .thoughtsContainer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .thought {
+      width: 220px;
+      background-color: lemonchiffon;
+      padding: 10px;
+
+      /* ❌ MISTAKE: border:8px is incomplete (missing style & color) */
+      /* ✅ FIX: Add style and color or remove completely */
+      /* border: 8px solid #ccc; OR just remove it */
+      
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      white-space: pre-wrap;
+      position: relative;
+    }
+
+    .thought[contenteditable] {
+      /* ❌ MISTAKE: 'dahed' is a typo */
+      /* ✅ FIX: Should be 'dashed' */
+      outline: 2px dashed rgb(255, 217, 2);
+      background-color: lightgoldenrodyellow;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 0.8rem;
+      padding: 4px;
+      background-color: lightsalmon;
+      color: white;
+      border-radius: 2px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background-color: coral;
+    }
+  </style>
+
+  <!-- ✅ Internal JavaScript -->
+  <script>
+    // ✅ Get existing thoughts from localStorage or initialize an empty array
+    let thoughts = JSON.parse(localStorage.getItem("thoughtsInput")) || [];
+
+    // ✅ Save thoughts array to localStorage
+    function saveThoughts() {
+      localStorage.setItem("thoughtWall", JSON.stringify(thoughts));
+    }
+
+    // ✅ Display all saved thoughts
+    function renderThoughts() {
+      const container = document.getElementById("thoughtsContainer");
+
+      // Clear previous content
+      container.innerHTML = "";
+
+      // Loop through each thought
+      thoughts.forEach((text, index) => {
+        const div = document.createElement("div");
+        div.className = "thought";
+        div.contentEditable = "true"; // Allow user to edit thought directly
+        div.innerText = text;
+
+        // ✅ Save changes when user edits the note
+        div.addEventListener("input", () => {
+          thoughts[index] = div.innerText; // Update specific thought
+          saveThoughts(); // Save to localStorage
+        });
+
+        // ✅ Create a delete button
+        const delete_btn = document.createElement("button");
+        delete_btn.className = "delete-btn";
+        delete_btn.innerText = "❌";
+
+        // ✅ Delete this thought when clicked
+        delete_btn.onclick = () => {
+          thoughts.splice(index, 1); // Remove from array
+          saveThoughts();            // Save new list
+          renderThoughts();          // Re-render list
+        };
+
+        // Add delete button to the thought box
+        div.appendChild(delete_btn);
+
+        // Add thought box to the container
+        container.appendChild(div);
+      });
+    }
+
+    // ✅ Called when user clicks "Add Thought Brick"
+    function addThought() {
+      const input = document.getElementById("thoughtsInput");
+      const text = input.value.trim(); // Trim whitespace
+
+      // Only save if text is not empty
+      if (text) {
+        thoughts.push(text); // Add new thought
+        saveThoughts();      // Save to localStorage
+        renderThoughts();    // Refresh the display
+        input.value = "";    // Clear input box
+      }
+    }
+
+    // ✅ Initial render of saved thoughts on page load
+    renderThoughts();
+  </script>
+</body>
+</html>
